@@ -13,7 +13,7 @@ let auth: AuthPage;
 test.describe('Authentication Tests', () => {
 
   test.beforeAll(() => {
-    username = faker.internet.username();
+    username = faker.internet.username().replace('.', '_');
     email = faker.internet.email();
     password = faker.internet.password({ length: 12 }); 
   });
@@ -51,14 +51,17 @@ test.describe('Authentication Tests', () => {
 
   test('should fail login with incorrect password', async ({ page }) => {
     const envUsername = process.env.VIKUNJA_USERNAME!;
-    const wrongPassword = 'WrongPass123!';
+    const wrongPassword = process.env.INVAILD_PASSWORD!;
     await auth.login(envUsername, wrongPassword);
     await expect(page.locator('text=Wrong username or password.')).toBeVisible();
   });
 
   test('should fail registration with invalid email', async ({ page }) => {
+    const envUsername = process.env.VIKUNJA_USERNAME!;
+    const envPassword = process.env.VIKUNJA_PASSWORD!;
+    const invaildEmail = process.env.INVAILD_EMAIL!;
     await auth.createAccountButton.click();
-    await auth.register('testuser', 'invalid-email', 'Test@1234');
+    await auth.register(envUsername, invaildEmail, envPassword);
     await expect(auth.provideEmail).toBeVisible();
   });
 

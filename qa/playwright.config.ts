@@ -5,12 +5,12 @@ dotenv.config();
 
 export default defineConfig({
   testDir: './tests',
-  // timeout: 90000,
-  // expect : {
-  //  timeout: 60 * 100
-  // },
+  timeout: 60000,
+  expect : {
+   timeout: 40 * 100
+  },
   retries: 0,
-  workers: 2,
+  workers: 1,
 
   use: {
     baseURL: process.env.BASE_URL,

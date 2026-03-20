@@ -5,7 +5,7 @@ import { createNewProject,
   deleteProject
  } from '../../hepler/hepler.js';
 
-test.only('can create, update and delete project', async ({ page }) => {
+test('can create, update and delete project', async ({ page }) => {
   const auth = new AuthPage(page);
   await page.goto('/');
   

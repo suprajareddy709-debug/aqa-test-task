@@ -36,7 +36,7 @@ npx playwright test --ui
 After tests:
 npx playwright show-report
 
-## HTML reports include traces, screenshots on failure, and video recordings for debugging.
+HTML reports include traces, screenshots on failure, and video recordings for debugging.
 
 ## Test Coverage
 
