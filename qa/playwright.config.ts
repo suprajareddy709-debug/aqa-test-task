@@ -1,16 +1,19 @@
 import { defineConfig, devices } from '@playwright/test';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export default defineConfig({
   testDir: './tests',
-  timeout: 90000,
-  expect : {
-   timeout: 60 * 100
-  },
+  // timeout: 90000,
+  // expect : {
+  //  timeout: 60 * 100
+  // },
   retries: 0,
   workers: 2,
 
   use: {
-    baseURL: 'http://localhost:8080',
+    baseURL: process.env.BASE_URL,
     headless: false,
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',

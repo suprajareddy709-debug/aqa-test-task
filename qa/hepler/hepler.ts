@@ -14,7 +14,6 @@ export async function createNewProject (page: Page, projectName: string) {
 
 export async function updateProject (page: Page, projectName: string, button: string, updatedProjectName:string) {
     const projectHomePage = new ProjectPage(page);
-    await page.waitForTimeout(500);
     await projectHomePage.clickOnProjects3dots(projectName);
     await projectHomePage.selectProjectButtons(projectName, button);
     await projectHomePage.updateTitle.fill(updatedProjectName);
@@ -24,7 +23,6 @@ export async function updateProject (page: Page, projectName: string, button: st
 
 export async function deleteProject (page: Page, projectName:string, button: string) {
     const projectHomePage = new ProjectPage(page);
-    await page.waitForTimeout(500);
     await projectHomePage.clickOnProjects3dots(projectName);
     await projectHomePage.selectProjectButtons(projectName, button);
     await expect(projectHomePage.deleteprojectContent).toBeVisible();

@@ -1,16 +1,16 @@
 import { test } from '@playwright/test';
-import { AuthPage } from '../pages/login.page.js';
+import { AuthPage } from '../../pages/login.page.js';
 import { createNewProject,
   updateProject,
   deleteProject
- } from '../hepler/hepler.js';
+ } from '../../hepler/hepler.js';
 
-test('can create, update and delete project', async ({ page }) => {
+test.only('can create, update and delete project', async ({ page }) => {
   const auth = new AuthPage(page);
   await page.goto('/');
   
-  const username = 'testuser';
-  const password = 'Test@1234';
+  const username = process.env.VIKUNJA_USERNAME!;
+  const password = process.env.VIKUNJA_PASSWORD!;
 
   // Login first
    await auth.login(username, password);
