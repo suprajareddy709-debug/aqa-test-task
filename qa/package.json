@@ -8,7 +8,8 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^10.3.0",
-    "@playwright/test": "^1.42.0",
+    "@playwright/test": "^1.58.2",
+    "allure-playwright": "^3.6.0",
     "dotenv": "^17.3.1",
     "ts-node": "^10.0.0",
     "typescript": "^5.0.0"

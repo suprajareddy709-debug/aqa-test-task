@@ -1,16 +1,17 @@
 import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
+import path from 'path';
 
-dotenv.config();
+dotenv.config({
+path: path.resolve(process.cwd(), '.env')});
 
 export default defineConfig({
-  testDir: './tests',
   timeout: 60000,
   expect : {
    timeout: 40 * 100
   },
-  retries: 0,
-  workers: 1,
+  retries: 1,
+  workers: 2,
 
   use: {
     baseURL: process.env.BASE_URL,
@@ -22,7 +23,8 @@ export default defineConfig({
 
   reporter: [
     ['list'],                  
-    ['html', { open: 'never' }]
+    ['html', { open: 'never' }],
+    ['allure-playwright', { open: 'never'}]
   ],
 projects: [
   {

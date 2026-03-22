@@ -1,42 +1,61 @@
-import type{ Page , Locator } from '@playwright/test';
+import type { Page, Locator } from '@playwright/test';
 
 export class AuthPage {
-  readonly createAccountButton: Locator;
-  readonly userProfile: Locator;
-  readonly provideUserName: Locator;
-  readonly providePassword: Locator;
-  readonly provideEmail: Locator;
-  readonly userNameInputField: Locator;
-  readonly emailInputField: Locator;
-  readonly passwordInputField: Locator;
-  readonly registercreateAccount: Locator;
+  readonly createAccountLink: Locator;
+  readonly userProfileName: Locator;
+
+  readonly usernameError: Locator;
+  readonly passwordError: Locator;
+  readonly emailError: Locator;
+
+  readonly usernameInput: Locator;
+  readonly emailInput: Locator;
+  readonly passwordInput: Locator;
+
+  readonly registerButton: Locator;
+  readonly loginButton: Locator;
+  readonly projectsTab: Locator;
 
   constructor(private page: Page) {
-    this.createAccountButton = this.page.locator('//a[text()="Create account"]');
-    this.userProfile = this.page.locator('span.username');
-    this.provideUserName = this.page.locator('p', {hasText: 'Please provide a username.'})
-    this.providePassword = this.page.locator('p', {hasText: 'Please provide a password.'})
-    this.provideEmail = this.page.locator('p', {hasText: 'Please enter a valid email address.'});
-    this.userNameInputField = this.page.locator('input[name="username"]');
-    this.emailInputField = this.page.locator('input[name="email"]');
-    this.passwordInputField = this.page.locator('input[name="password"]');
-    this.registercreateAccount = this.page.locator('//button/span[text()="Create account"]');
+    this.createAccountLink = this.page.getByRole('link', { name: 'Create account' });
+    this.userProfileName = this.page.locator('span.username');
+
+    this.usernameError = this.page.getByText('Please provide a username.');
+    this.passwordError = this.page.getByText('Please provide a password.');
+    this.emailError = this.page.getByText('Please enter a valid email address.');
+
+    this.usernameInput = this.page.getByLabel('Username').or(this.page.locator('input[name="username"]'));
+    this.emailInput = this.page.getByLabel('Email').or(this.page.locator('input[name="email"]'));
+    this.passwordInput = this.page.locator('input[name="password"]');
+
+    this.registerButton = this.page.getByRole('button', { name: 'Create account' });
+    this.loginButton = this.page.getByRole('button', { name: 'Login' });
+    this.projectsTab = this.page.getByText('Projects');
   }
 
-  async goto() {
-    await this.page.goto('/');
+  async navigateToLogin() {
+    await this.page.goto('http://localhost:8080/', {waitUntil: 'load'});
   }
 
-  async register(username: string, email: string, password: string) {
-    await this.page.fill('input[name="username"]', username);
-    await this.page.fill('input[name="email"]', email);
-    await this.page.fill('input[name="password"]', password);
-    await this.page.click('//button/span[text()="Create account"]');
-  }
+  async registerUser(
+  username: string,
+  email: string,
+  password: string,
+  shouldSubmit: boolean = true) {
+  await this.usernameInput.fill(username);
+  await this.emailInput.fill(email);
+  await this.passwordInput.fill(password);
 
-  async login(username: string, password: string) {
-    await this.page.fill('input[name="username"]', username);
-    await this.page.fill('input[name="password"]', password);
-    await this.page.click('//button/span[text()="Login"]');
+  if (shouldSubmit) {
+    await this.registerButton.click();
+  }
+}
+
+  async loginUser(
+    username: string, 
+    password: string) {
+    await this.usernameInput.fill(username);
+    await this.passwordInput.fill(password);
+    await this.loginButton.click();
   }
 }

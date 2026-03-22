@@ -1,26 +1,21 @@
-import { test } from '@playwright/test';
-import { AuthPage } from '../../pages/login.page.js';
-import { createNewProject,
-  updateProject,
-  deleteProject
- } from '../../hepler/hepler.js';
+import { test, expect } from '../../fixture.js';
+import {
+  createProject,
+  updateProjectByName,
+  deleteProjectByName
+} from '../../hepler/helper.js';
 
-test('can create, update and delete project', async ({ page }) => {
-  const auth = new AuthPage(page);
-  await page.goto('/');
-  
+test('can create, update and delete project', { tag: ['@regression', '@Vikunja'] }, async ({ auth, page }) => {
+
+  await auth.navigateToLogin();
+
   const username = process.env.VIKUNJA_USERNAME!;
   const password = process.env.VIKUNJA_PASSWORD!;
+  await auth.loginUser(username, password);
 
-  // Login first
-   await auth.login(username, password);
+  await createProject(page, 'My Test Project');
 
-  // Create project
-  await createNewProject(page,"My Test Project");
+  await updateProjectByName(page, 'My Test Project', 'Edit', 'My Updated Project');
 
-  // // Update project
-  await updateProject(page, "My Test Project", "Edit", "My Updated Project");
-  
-  // Delete project
-  await deleteProject(page, "My Updated Project", "Delete");
+  await deleteProjectByName(page, 'My Updated Project', 'Delete');
 });

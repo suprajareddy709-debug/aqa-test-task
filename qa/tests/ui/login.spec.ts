@@ -1,68 +1,50 @@
-import { test, expect } from '@playwright/test';
-import { AuthPage } from '../../pages/login.page.js';
-import { faker } from '@faker-js/faker';
-import dotenv from 'dotenv';
+import { test, expect } from '../../fixture.js';
 
-dotenv.config();
+test.describe('Authentication Tests', { tag: ['@Vikunja'] }, () => {
 
-let username: string;
-let email: string;
-let password: string;
-let auth: AuthPage;
-
-test.describe('Authentication Tests', () => {
-
-  test.beforeAll(() => {
-    username = faker.internet.username().replace('.', '_');
-    email = faker.internet.email();
-    password = faker.internet.password({ length: 12 }); 
-  });
-  
-  test.beforeEach(async ({ page }) => {
-      auth = new AuthPage(page);
-      await auth.goto();
+  test.beforeEach(async ({ auth }) => {
+    await auth.navigateToLogin();
   });
 
-  test('should register a new user', async ({ page }) => {
-    await auth.createAccountButton.click();
-    await auth.register(username, email, password);
-    await expect(auth.userProfile).toHaveText(username);
+  test('should register a new user', { tag: ['@regression', '@smoke'] }, async ({ auth, randomUser }) => {
+    await auth.createAccountLink.click();
+    await auth.registerUser(randomUser.username, randomUser.email, randomUser.password);
+    await expect(auth.userProfileName).toHaveText(randomUser.username);
   });
 
-  test('should login with environment user', async ({ page }) => {
-    const envUsername = process.env.VIKUNJA_USERNAME!;
-    const envPassword = process.env.VIKUNJA_PASSWORD!;
-
-    await auth.login(envUsername, envPassword);
-    await expect(page.locator('text=Projects')).toBeVisible();
+  test('should login with environment user', { tag: ['@smoke', '@login'] }, async ({ auth }) => {
+    const username = process.env.VIKUNJA_USERNAME!;
+    const password = process.env.VIKUNJA_PASSWORD!;
+    await auth.loginUser(username, password);
+    await expect(auth.projectsTab).toBeVisible();
   });
 
-   test('should not allow registration with empty fields', async ({ page }) => {
-    await auth.createAccountButton.click();
-    await auth.userNameInputField.fill('')
-    await auth.passwordInputField.fill('')
-    await auth.emailInputField.fill('');
-    await auth.userNameInputField.fill('')
-    await expect(auth.registercreateAccount).toBeDisabled();
-    await expect(auth.provideUserName).toBeVisible();
-    await expect(auth.provideEmail).toBeVisible();
-    await expect(auth.providePassword).toBeVisible();
+  test('should not allow registration with empty fields', { tag: ['@negative', '@regression'] }, async ({ auth }) => {
+    await auth.createAccountLink.click();
+    await auth.usernameInput.fill('');
+    await auth.passwordInput.fill('');
+    await auth.emailInput.fill('');
+    await auth.passwordInput.fill('');
+    await expect(auth.registerButton).toBeDisabled();
+    await expect(auth.usernameError).toBeVisible();
+    await expect(auth.emailError).toBeVisible();
+    await expect(auth.passwordError).toBeVisible();
   });
 
-  test('should fail login with incorrect password', async ({ page }) => {
-    const envUsername = process.env.VIKUNJA_USERNAME!;
-    const wrongPassword = process.env.INVAILD_PASSWORD!;
-    await auth.login(envUsername, wrongPassword);
-    await expect(page.locator('text=Wrong username or password.')).toBeVisible();
+  test('should fail login with incorrect password', { tag: ['@negative', '@login'] }, async ({ auth, page }) => {
+    const username = process.env.VIKUNJA_USERNAME!;
+    const wrongPassword = process.env.INVALID_PASSWORD!;
+    await auth.loginUser(username, wrongPassword);
+    await expect(page.getByText('Wrong username or password.')).toBeVisible();
   });
 
-  test('should fail registration with invalid email', async ({ page }) => {
-    const envUsername = process.env.VIKUNJA_USERNAME!;
-    const envPassword = process.env.VIKUNJA_PASSWORD!;
-    const invaildEmail = process.env.INVAILD_EMAIL!;
-    await auth.createAccountButton.click();
-    await auth.register(envUsername, invaildEmail, envPassword);
-    await expect(auth.provideEmail).toBeVisible();
+  test('should fail registration with invalid email', { tag: ['@negative', '@regression'] }, async ({ auth }) => {
+    const username = process.env.VIKUNJA_USERNAME!;
+    const password = process.env.VIKUNJA_PASSWORD!;
+    const invalidEmail = process.env.INVALID_EMAIL!;
+    await auth.createAccountLink.click();
+    await auth.registerUser(username, invalidEmail, password, false);
+    await expect(auth.emailError).toBeVisible();
   });
 
 });
