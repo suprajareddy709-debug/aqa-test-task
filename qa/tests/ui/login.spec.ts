@@ -1,6 +1,6 @@
 import { test, expect } from '../../fixture';
 
-test.describe('Authentication Tests', { tag: ['@Vikunja'] }, () => {
+test.describe('Authentication Tests', () => {
 
   test.beforeEach(async ({ auth }) => {
     await auth.navigateToLogin();

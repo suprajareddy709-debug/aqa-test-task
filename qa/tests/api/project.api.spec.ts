@@ -7,7 +7,7 @@ const BASE_URL = 'http://localhost:8080/api/v1';
 const USERNAME = process.env.VIKUNJA_USERNAME!;
 
 
-test.describe('Vikunja API Tests',  { tag: ['@Vikunja'] }, () => {
+test.describe('Vikunja API Tests', () => {
 
   test('GET current user', async ({api}) => {
     const res = await api.get(`${BASE_URL}/user`);
