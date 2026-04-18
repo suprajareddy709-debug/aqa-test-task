@@ -1,4 +1,4 @@
-import { test, expect } from '../../fixture.js';
+import { test, expect } from '../../fixture';
 import { request } from  '@playwright/test'
 
 
