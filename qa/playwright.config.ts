@@ -1,36 +1,38 @@
 import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
-import path from 'path';
 
-dotenv.config({
-path: path.resolve(process.cwd(), '.env')});
+dotenv.config();
 
 export default defineConfig({
+  testDir: './tests',
+
   timeout: 60000,
-  expect : {
-   timeout: 40 * 100
+
+  expect: {
+    timeout: 5000,
   },
+
   retries: 1,
   workers: 2,
 
   use: {
     baseURL: process.env.BASE_URL,
-    headless: false,
+    headless: true,
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     trace: 'on-first-retry',
   },
 
   reporter: [
-    ['list'],                  
+    ['list'],
     ['html', { open: 'never' }],
-    ['allure-playwright', { open: 'never'}]
+    ['allure-playwright'],
   ],
-projects: [
-  {
-    name: 'chromium',
-    use: {
-      ...devices['Desktop Chrome'],
-    }
-  }]
+
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+  ],
 });

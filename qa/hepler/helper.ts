@@ -1,14 +1,13 @@
 import type { Page, Browser } from '@playwright/test';
 import { expect, request } from '@playwright/test';
-import { ProjectPage } from '../pages/project.page.js';
-import { AuthPage } from '../pages/login.page.js';
+import { ProjectPage } from '../pages/project.page';
+import { AuthPage } from '../pages/login.page';
 
 // Create Project
 export async function createProject(page: Page, name: string) {
   const projectPage = new ProjectPage(page);
 
   await projectPage.projectsTab.click();
-
   await deleteProjectIfExists(page, name);
 
   await projectPage.newProjectButton.click();
@@ -18,7 +17,7 @@ export async function createProject(page: Page, name: string) {
   await expect(projectPage.getProjectByName(name)).toBeVisible();
 }
 
-//  Update Project
+// Update Project
 export async function updateProjectByName(
   page: Page,
   oldName: string,
@@ -31,7 +30,6 @@ export async function updateProjectByName(
   await projectPage.selectProjectAction(action);
 
   await projectPage.editTitleInput.fill(newName);
-  await expect(projectPage.saveButton).toBeVisible();
   await projectPage.saveButton.click();
 
   await expect(projectPage.getProjectByName(newName)).toBeVisible();
@@ -48,45 +46,42 @@ export async function deleteProjectByName(
   await projectPage.openProjectMenu(name);
   await projectPage.selectProjectAction(action);
 
-  await expect(projectPage.confirmDeleteButton).toBeVisible();
   await projectPage.confirmDeleteButton.click();
 
   await expect(projectPage.getProjectByName(name)).toHaveCount(0);
 }
 
-// Delete if exists (Reusable + Safe)
+// Safe delete
 export async function deleteProjectIfExists(page: Page, name: string) {
   const projectPage = new ProjectPage(page);
 
-  const exists = await projectPage.isProjectVisible(name);
-
-  if (exists) {
+  if (await projectPage.isProjectVisible(name)) {
     await projectPage.openProjectMenu(name);
     await projectPage.selectProjectAction('Delete');
-
     await projectPage.confirmDeleteButton.click();
 
     await expect(projectPage.getProjectByName(name)).toHaveCount(0);
   }
 }
 
+// API helpers
 export async function getToken(browser: Browser): Promise<string> {
   const context = await browser.newContext();
   const page = await context.newPage();
   const auth = new AuthPage(page);
-  const UI_URL = 'http://localhost:8080';
 
-  await page.goto(`${UI_URL}/login`);
+  await page.goto('http://localhost:8080/login');
 
-  const USERNAME = process.env.VIKUNJA_USERNAME!;
-  const PASSWORD = process.env.VIKUNJA_PASSWORD!;
-  await auth.loginUser(USERNAME, PASSWORD);
+  await auth.loginUser(
+    process.env.VIKUNJA_USERNAME!,
+    process.env.VIKUNJA_PASSWORD!
+  );
 
-  await page.waitForLoadState('networkidle');
+  const token = await page.evaluate(() =>
+    localStorage.getItem('token')
+  );
 
-  const token = await page.evaluate(() => localStorage.getItem('token'));
-
-  if (!token) throw new Error('Token not found after login');
+  if (!token) throw new Error('Token not found');
 
   await context.close();
   return token;
@@ -94,14 +89,12 @@ export async function getToken(browser: Browser): Promise<string> {
 
 export async function getApiContext(browser: Browser) {
   const token = await getToken(browser);
-  const BASE_URL = 'http://localhost:8080/api/v1';
 
   return request.newContext({
-    baseURL: BASE_URL,
+    baseURL: 'http://localhost:8080/api/v1',
     extraHTTPHeaders: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
-      Accept: 'application/json',
     },
   });
 }
