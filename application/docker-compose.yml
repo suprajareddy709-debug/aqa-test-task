@@ -32,6 +32,15 @@ services:
       - db
     restart: unless-stopped
 
+  name: Run Tests
+  run: npx playwright test
+  env:
+    VIKUNJA_USERNAME: ${{ secrets.VIKUNJA_USERNAME }}
+    VIKUNJA_EMAIL: ${{ secrets.VIKUNJA_EMAIL }}
+    VIKUNJA_PASSWORD: ${{ secrets.VIKUNJA_PASSWORD }}
+    INVALID_PASSWORD: ${{ secrets.INVALID_PASSWORD }}
+    INVALID_EMAIL: ${{ secrets.INVALID_EMAIL }}
+
 volumes:
   vikunja_db:
   vikunja_files:
